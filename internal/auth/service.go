@@ -59,19 +59,20 @@ func (s *authServiceImpl) Register(ctx context.Context, dto *RegisterRequestDTO)
 	if err != nil {
 		return err
 	}
-	go func(emailAddr, token string) {
-		emailCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := s.emailService.SendEmail(emailCtx, email.Params{
-			Subject: "Verification",
-			Message: s.env.TargetURL + token,
-			Reciever: email.Reciever{
-				Email: emailAddr,
-			}}); err != nil {
-			s.logger.Error(err)
-		}
-	}(user.Email, token)
+	go s.sendEmail(user.Email, token, "Verification")
 	return nil
+}
+func (s *authServiceImpl) sendEmail(emailAddr, token, subject string) {
+	emailCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := s.emailService.SendEmail(emailCtx, email.Params{
+		Subject: subject,
+		Message: s.env.TargetURL + token,
+		Reciever: email.Reciever{
+			Email: emailAddr,
+		}}); err != nil {
+		s.logger.Error(err)
+	}
 }
 func (s *authServiceImpl) Login(ctx context.Context, dto *LoginRequestDTO) (TokensResponseDto, error) {
 	user, err := s.userRepo.FindByEmail(ctx, dto.Email)
