@@ -58,7 +58,7 @@ This repository provides a production-ready backend boilerplate for building RES
 ├── pkg                   # Shared helpers (env, pagination, http responses, crypto)
 │
 ├── docs                  # Project documentation
-│   ├── api.md            # API overview / contract
+│   └── api.md            # API overview / contract
 │
 ├── scripts               # Helper scripts (ops/dev)
 │   ├── migrate.sh
