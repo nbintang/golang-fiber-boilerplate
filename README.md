@@ -4,6 +4,8 @@
       <img height="125" alt="Fiber" src="https://raw.githubusercontent.com/gofiber/docs/master/static/img/logo.svg">
     </picture>
   </a>
+
+  
 # Fiber REST API Boilerplate
 
 ## Project Description
