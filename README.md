@@ -57,19 +57,15 @@ This repository provides a production-ready backend boilerplate for building RES
 │
 ├── pkg                   # Shared helpers (env, pagination, http responses, crypto)
 │
-├── docs                  # 📚 Project documentation
+├── docs                  # Project documentation
 │   ├── api.md            # API overview / contract
-│   ├── auth.md           # Auth flow (JWT, refresh, verify)
-│   ├── database.md       # Schema, migration strategy
-│   ├── architecture.md  # High-level architecture & decisions
-│   └── deployment.md    # Docker, env, prod notes
 │
-├── scripts               # 🧪 Helper scripts (ops/dev)
+├── scripts               # Helper scripts (ops/dev)
 │   ├── migrate.sh
 │   ├── seed.sh
 │   └── reset-db.sh
 │
-├── tests                 # 🧪 Integration / e2e tests (optional)
+├── tests                 # Integration / e2e tests (optional)
 │   ├── auth_test.go
 │   └── user_test.go
 │
