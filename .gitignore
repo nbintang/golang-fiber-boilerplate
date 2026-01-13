@@ -1,0 +1,57 @@
+# =====================
+# Environment files
+# =====================
+.env
+# delete this env local if you need to unpublic
+#.env.local
+#.env.*.local
+
+# =====================
+# Go build artifacts
+# =====================
+bin/
+build/
+dist/
+tmp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# =====================
+# Go workspace & cache
+# =====================
+vendor/
+go.work
+go.work.sum
+
+# =====================
+# Logs
+# =====================
+*.log
+logs/
+*.pid
+
+# =====================
+# IDE / Editor
+# =====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Docker
+# =====================
+docker-data/
+docker-volumes/

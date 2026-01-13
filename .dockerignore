@@ -1,0 +1,41 @@
+# =====================
+# Git & VCS
+# =====================
+.git
+.gitignore
+
+# =====================
+# Environment files
+# =====================
+.env
+.env.*
+*.env
+
+# =====================
+# Local artifacts
+# =====================
+vendor/
+tmp/
+bin/
+build/
+dist/
+
+# =====================
+# Logs & debug
+# =====================
+*.log
+*.out
+*.pid
+
+# =====================
+# IDE / OS
+# =====================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =====================
+# Docker files (optional)
+# =====================
+docker-compose.yml

@@ -1,0 +1,127 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: app_db
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: app_redis
+    # kalau REDIS_PASSWORD kosong, redis jalan tanpa auth
+    command: >
+      sh -c '
+        if [ -n "$$REDIS_PASSWORD" ]; then
+          redis-server --requirepass "$$REDIS_PASSWORD";
+        else
+          redis-server;
+        fi
+      '
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # jalanin migrasi sekali sebelum api start
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_migrate
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # DB
+      DATABASE_HOST: db
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: 5432
+      DATABASE_SSL_MODE: ${DATABASE_SSL_MODE:-disable}
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      # JWT (kalau migrate butuh config ini, kalau tidak ya tetap aman)
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_VERIFICATION_SECRET: ${JWT_VERIFICATION_SECRET}
+
+      # SMTP (kalau tidak dipakai migrate, tetap boleh)
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SENDER: ${SMTP_SENDER}
+      SMTP_EMAIL: ${SMTP_EMAIL}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+
+      # App
+      APP_ADDR: ${APP_ADDR:-0.0.0.0:3000}
+      TARGET_URL: ${TARGET_URL}
+    command: ["/app/migrate"]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_api
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      # DB (host service name: db)
+      DATABASE_HOST: db
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: 5432
+      DATABASE_SSL_MODE: ${DATABASE_SSL_MODE:-disable}
+
+      # Redis (host service name: redis)
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      # App
+      APP_ADDR: ${APP_ADDR:-0.0.0.0:3000}
+      TARGET_URL: ${TARGET_URL}
+
+      # JWT
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_VERIFICATION_SECRET: ${JWT_VERIFICATION_SECRET}
+
+      # SMTP
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SENDER: ${SMTP_SENDER}
+      SMTP_EMAIL: ${SMTP_EMAIL}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  redis_data:
