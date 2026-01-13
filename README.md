@@ -43,21 +43,43 @@ This repository provides a production-ready backend boilerplate for building RES
 │   ├── api              # API entrypoint
 │   ├── migrate          # DB migration entrypoint
 │   └── seed             # DB seeding entrypoint
+│
 ├── config               # Environment configuration and module wiring
-├── internal             # Application modules and infrastructure
-│   ├── auth             # Auth domain (routes, handlers, services)
-│   ├── user             # User domain (entities, repository, services)
-│   ├── http             # HTTP routing contracts, middleware, error handling
-│   ├── infra            # Infrastructure services (db, redis, email, token, logger)
-│   ├── identity         # Current user and claims helpers
-│   ├── enums            # Typed enums for roles, tokens, access levels
-│   └── apperr           # Centralized error types
-├── pkg                  # Shared helpers (env, pagination, http responses, crypto)
-├── .env.example         # Sample environment variables
-├── Dockerfile           # Container build
-├── docker-compose.yml   # Local dev dependencies
-├── Makefile             # Local dev commands
-└── go.mod               # Go module definition
+│
+├── internal              # Application modules and infrastructure
+│   ├── auth              # Auth domain (routes, handlers, services)
+│   ├── user              # User domain (entities, repository, services)
+│   ├── http              # HTTP routing contracts, middleware, error handling
+│   ├── infra             # Infrastructure services (db, redis, email, token, logger)
+│   ├── identity          # Current user and claims helpers
+│   ├── enums             # Typed enums for roles, tokens, access levels
+│   └── apperr            # Centralized error types
+│
+├── pkg                   # Shared helpers (env, pagination, http responses, crypto)
+│
+├── docs                  # 📚 Project documentation
+│   ├── api.md            # API overview / contract
+│   ├── auth.md           # Auth flow (JWT, refresh, verify)
+│   ├── database.md       # Schema, migration strategy
+│   ├── architecture.md  # High-level architecture & decisions
+│   └── deployment.md    # Docker, env, prod notes
+│
+├── scripts               # 🧪 Helper scripts (ops/dev)
+│   ├── migrate.sh
+│   ├── seed.sh
+│   └── reset-db.sh
+│
+├── tests                 # 🧪 Integration / e2e tests (optional)
+│   ├── auth_test.go
+│   └── user_test.go
+│
+├── .env.example          # Sample environment variables
+├── .gitignore
+├── Dockerfile            # Container build
+├── docker-compose.yml    # Local dev dependencies
+├── Makefile              # Local dev commands
+├── go.mod                # Go module definition
+└── README.md             # Project overview (entry doc)
 ```
 
 ### Folder responsibilities
