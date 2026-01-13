@@ -1,11 +1,34 @@
+<h1 align="center">
   <a href="https://gofiber.io">
     <picture>
       <source height="125" media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/gofiber/docs/master/static/img/logo-dark.svg">
       <img height="125" alt="Fiber" src="https://raw.githubusercontent.com/gofiber/docs/master/static/img/logo.svg">
     </picture>
   </a>
+  <br>
+  <a href="https://pkg.go.dev/github.com/gofiber/fiber/v3#pkg-overview">
+    <img src="https://img.shields.io/badge/%F0%9F%93%9A%20godoc-pkg-00ACD7.svg?color=00ACD7&style=flat-square">
+  </a>
+  <a href="https://goreportcard.com/report/github.com/gofiber/fiber/v3">
+    <img src="https://img.shields.io/badge/%F0%9F%93%9D%20goreport-A%2B-75C46B?style=flat-square">
+  </a>
+  <a href="https://codecov.io/gh/gofiber/fiber" >
+   <img alt="Codecov" src="https://img.shields.io/codecov/c/github/gofiber/fiber?token=3Cr92CwaPQ&style=flat-square&logo=codecov&label=codecov">
+ </a>
+  <a href="https://github.com/gofiber/fiber/actions?query=workflow%3ATest">
+    <img src="https://img.shields.io/github/actions/workflow/status/gofiber/fiber/test.yml?branch=main&label=%F0%9F%A7%AA%20tests&style=flat-square&color=75C46B">
+  </a>
+    <a href="https://docs.gofiber.io">
+    <img src="https://img.shields.io/badge/%F0%9F%92%A1%20fiber-docs-00ACD7.svg?style=flat-square">
+  </a>
+  <a href="https://gofiber.io/discord">
+    <img src="https://img.shields.io/discord/704680098577514527?style=flat-square&label=%F0%9F%92%AC%20discord&color=00ACD7">
+  </a>
+</h1>
+<p align="center">
+  <em><b>Fiber</b> is an <a href="https://github.com/expressjs/express">Express</a> inspired <b>web framework</b> built on top of <a href="https://github.com/valyala/fasthttp">Fasthttp</a>, the <b>fastest</b> HTTP engine for <a href="https://go.dev/doc/">Go</a>. Designed to <b>ease</b> things up for <b>fast</b> development with <a href="https://docs.gofiber.io/#zero-allocation"><b>zero memory allocation</b></a> and <b>performance</b> in mind.</em>
+</p>>
 
-  
 # Fiber REST API Boilerplate
 
 ## Project Description
