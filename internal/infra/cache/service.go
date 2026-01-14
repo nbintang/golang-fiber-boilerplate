@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"context"
+	"context" 
 	"fmt"
 	"rest-fiber/config"
 	"runtime"
@@ -24,7 +24,7 @@ func NewService(env config.Env) (Service, error) {
 		return nil, fmt.Errorf("REDIS_HOST is empty")
 	}
 
-	portStr := strings.TrimSpace("6379")
+	portStr := strings.TrimSpace(env.RedisPort)
 	if portStr == "" {
 		return nil, fmt.Errorf("REDIS_PORT is empty")
 	}
