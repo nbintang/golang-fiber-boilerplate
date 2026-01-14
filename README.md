@@ -8,7 +8,7 @@
 </h1>
 
 
-# Fiber REST API Boilerplate
+# Fiber Opinionated REST API Boilerplate
 
 ## Project Description
 This repository provides a production-ready backend boilerplate for building RESTful APIs and microservices in Go. It combines Fiber for fast HTTP handling, Uber Fx for dependency injection, and GORM for database access to deliver a modular architecture that scales from small services to larger SaaS backends.
