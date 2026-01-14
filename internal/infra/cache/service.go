@@ -7,6 +7,7 @@ import (
 	"rest-fiber/config"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	redisStorage "github.com/gofiber/storage/redis"
@@ -20,26 +21,43 @@ type serviceImpl struct {
 }
 
 func NewService(env config.Env) (Service, error) {
-	host := env.RedisHost
-	port, _ := strconv.Atoi(env.RedisPort)
-	address := fmt.Sprintf("%s:%s", host, strconv.Itoa(port))
+	host := strings.TrimSpace(env.RedisHost)
+	if host == "" {
+		return nil, fmt.Errorf("REDIS_HOST is empty")
+	}
+
+	portStr := strings.TrimSpace(env.RedisPort)
+	if portStr == "" {
+		return nil, fmt.Errorf("REDIS_PORT is empty")
+	}
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil || port <= 0 || port > 65535 {
+		return nil, fmt.Errorf("invalid REDIS_PORT=%q", portStr)
+	}
+
 	password := env.RedisPassword
+	address := fmt.Sprintf("%s:%d", host, port)
+
 	client := redis.NewClient(&redis.Options{
 		Addr:     address,
 		Password: password,
 		DB:       0,
 	})
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	if err := client.Ping(ctx).Err(); err != nil {
-		return nil, errors.New(err.Error())
+		return nil, fmt.Errorf("redis ping failed (%s): %w", address, err)
 	}
+
 	storage := redisStorage.New(redisStorage.Config{
-		Host:      host,
-		Port:      port,
-		Password:  password,
-		Database:  0,
-		PoolSize:  10 * runtime.GOMAXPROCS(0),
+		Host:     host,
+		Port:     port,
+		Password: password,
+		Database: 0,
+		PoolSize: 10 * runtime.GOMAXPROCS(0),
 	})
 
 	return &serviceImpl{
