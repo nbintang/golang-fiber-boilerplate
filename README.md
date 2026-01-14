@@ -58,12 +58,8 @@ This repository provides a production-ready backend boilerplate for building RES
 ├── pkg                   # Shared helpers (env, pagination, http responses, crypto)
 │
 ├── docs                  # Project documentation
-│   └── api.md            # API overview / contract
 │
 ├── scripts               # Helper scripts (ops/dev)
-│   ├── migrate.sh
-│   ├── seed.sh
-│   └── reset-db.sh
 │
 ├── e2e                 # Integration / e2e tests (optional)
 │   ├── auth_test.go
@@ -86,6 +82,9 @@ This repository provides a production-ready backend boilerplate for building RES
   - **http/**: Router contracts, middleware (JWT, role checks, request metadata), and error handling.
   - **infra/**: Infrastructure services (database, Redis cache, token service, validators, logging).
 - **pkg/**: Reusable utility packages shared across modules (pagination, password hashing, HTTP response helpers, slice utilities).
+- **e2e/**: End-to-end and integration tests. Covers real application flows across HTTP, database, and external dependencies.
+- **docs/**: Project documentation and technical references. Used to document architecture, workflows, environment setup, and deployment notes..
+- **scripts/**: Helper scripts for development and operational tasks. Contains automation scripts for migrations, seeding, database resets, and local workflows.
 
 ## Getting Started
 ### Prerequisites
