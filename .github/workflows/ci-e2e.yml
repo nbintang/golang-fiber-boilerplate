@@ -1,0 +1,61 @@
+name: CI – Integration / E2E
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "master", "develop"]
+
+jobs:
+  integration-e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fiber_rest_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fiber_rest_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: fiber_rest_db
+      DATABASE_PORT: 5432
+      DATABASE_SSL_MODE: disable
+
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+
+      JWT_ACCESS_SECRET: test-access
+      JWT_VERIFICATION_SECRET: test-verify
+      JWT_REFRESH_SECRET: test-refresh
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go mod download
+      - run: go run ./cmd/migrate
+      - run: go test ./e2e -v
