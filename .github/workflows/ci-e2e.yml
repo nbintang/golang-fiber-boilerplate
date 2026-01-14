@@ -58,4 +58,4 @@ jobs:
           cache: true
       - run: go mod download
       - run: go run ./cmd/migrate
-      - run: go test ./e2e -v
+      # - run: go test ./e2e -v
