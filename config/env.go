@@ -60,29 +60,38 @@ type Env struct {
 }
 
 func NewEnvs() (Env, error) {
+	viper.Reset() 
 	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	appEnv := viper.GetString("APP_ENV")
-	if appEnv == "" {
-		appEnv = "local"
-	}
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) 
+ 
+	viper.SetDefault("APP_ENV", "local")
 
-	if appEnv == string(Development) || appEnv == string(Local) {
+	appEnv := viper.GetString("APP_ENV")
+ 
+	switch appEnv {
+	case string(Development), string(Local):
 		viper.SetConfigFile(".env.local")
-	} else if appEnv == string(Production) {
+	case string(Production):
 		viper.SetConfigFile(".env")
-	} else {
+	default:
 		viper.SetConfigFile(".env")
 	}
 
 	viper.SetConfigType("env")
-	_ = viper.ReadInConfig()
+ 
+	if err := viper.ReadInConfig(); err != nil {
+		 
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return Env{}, err
+		}
+	}
 
 	var env Env
 	if err := viper.Unmarshal(&env); err != nil {
 		return Env{}, err
 	}
 
+	
 	validate := validator.New()
 	if err := validate.Struct(env); err != nil {
 		return Env{}, err
@@ -90,3 +99,4 @@ func NewEnvs() (Env, error) {
 
 	return env, nil
 }
+
