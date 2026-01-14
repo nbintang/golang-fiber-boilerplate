@@ -63,6 +63,9 @@ func NewEnvs() (Env, error) {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	appEnv := viper.GetString("APP_ENV")
+	if appEnv == "" {
+		appEnv = "local"
+	}
 
 	if appEnv == string(Development) || appEnv == string(Local) {
 		viper.SetConfigFile(".env.local")
