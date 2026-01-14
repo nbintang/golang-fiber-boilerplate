@@ -67,7 +67,7 @@ func (s *authServiceImpl) sendEmail(emailAddr, token, subject string) {
 	defer cancel()
 	if err := s.emailService.SendEmail(emailCtx, email.Params{
 		Subject: subject,
-		Message: s.env.FrontendURL + token,
+		Message: s.env.FrontendURL + "/verify?token=" + token,
 		Reciever: email.Reciever{
 			Email: emailAddr,
 		}}); err != nil {
