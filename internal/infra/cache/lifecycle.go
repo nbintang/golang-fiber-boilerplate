@@ -1,4 +1,4 @@
-package rediscache
+package cache
 
 import (
 	"context"

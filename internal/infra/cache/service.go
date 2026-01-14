@@ -1,4 +1,4 @@
-package rediscache
+package cache
 
 import (
 	"context"
@@ -37,12 +37,8 @@ func NewService(env config.Env) (Service, error) {
 	storage := redisStorage.New(redisStorage.Config{
 		Host:      host,
 		Port:      port,
-		Username:  "",
 		Password:  password,
-		URL:       "",
 		Database:  0,
-		Reset:     false,
-		TLSConfig: nil,
 		PoolSize:  10 * runtime.GOMAXPROCS(0),
 	})
 

@@ -15,7 +15,7 @@ type Meta struct {
 	TimeStamp   int   `json:"timestamp"`
 }
 
-func NewPaginationMeta(page, limit int, total int64) Meta {
+func NewMeta(page, limit int, total int64) Meta {
 	if limit <= 0 {
 		limit = 10
 	}

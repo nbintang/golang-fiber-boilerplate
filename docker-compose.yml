@@ -105,7 +105,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
 
       # App
-      APP_ADDR: ${APP_ADDR:-0.0.0.0:3000}
+      APP_ADDR: ${APP_ADDR:-0.0.0.0:8080}
       TARGET_URL: ${TARGET_URL}
 
       # JWT
@@ -119,7 +119,7 @@ services:
       SMTP_EMAIL: ${SMTP_EMAIL}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
     ports:
-      - "3000:3000"
+      - "8080:8080"
     restart: unless-stopped
 
 volumes:

@@ -31,6 +31,8 @@ This repository provides a production-ready backend boilerplate for building RES
 - **JWT-based auth flows** and role-based access control scaffolding.
 - **Centralized configuration** with Viper and environment validation.
 - **Structured logging** using Logrus.
+- **Standardized API responses** with pagination metadata and validation error details.
+- **Request metadata middleware** for richer error payloads and logs.
 - **Security & scalability considerations**
   - JWT access/refresh secrets and token verification services.
   - Middleware layering for access control and request metadata.
@@ -83,7 +85,7 @@ This repository provides a production-ready backend boilerplate for building RES
   - **infra/**: Infrastructure services (database, Redis cache, token service, validators, logging).
 - **pkg/**: Reusable utility packages shared across modules (pagination, password hashing, HTTP response helpers, slice utilities).
 - **e2e/**: End-to-end and integration tests. Covers real application flows across HTTP, database, and external dependencies.
-- **docs/**: Project documentation and technical references. Used to document architecture, workflows, environment setup, and deployment notes..
+- **docs/**: Project documentation and technical references. Used to document architecture, workflows, environment setup, and deployment notes.
 - **scripts/**: Helper scripts for development and operational tasks. Contains automation scripts for migrations, seeding, database resets, and local workflows.
 
 ## Getting Started
@@ -103,12 +105,7 @@ This repository provides a production-ready backend boilerplate for building RES
 
 ### Run locally
 ```bash
-make run
-```
-Or, without Make:
-```bash
-export $(cat .env.local | xargs)
-go run ./cmd/api
+make dev
 ```
 
 ### Migrations and seeding
@@ -116,6 +113,18 @@ go run ./cmd/api
 make migrate
 make seed
 ```
+
+### Build and Clean build
+```bash
+make build
+make clean
+```
+
+## API Documentation
+- Base URL: `/api/v1`
+- Protected routes: `/api/v1/protected` (Bearer access token required)
+- Auth endpoints are throttled; refresh tokens are stored in an httpOnly cookie.
+- Full endpoint list and request/response examples: `docs/api.md`
 
 ## Best Practices
 - **Follow the module pattern**: Each feature module should expose its own `Module` that provides handlers, services, repositories, and routes.

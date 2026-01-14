@@ -7,37 +7,67 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Env struct {
-	DatabaseURL           string `mapstructure:"DATABASE_URL" validate:"omitempty"`
-	DatabaseHost          string `mapstructure:"DATABASE_HOST" validate:"omitempty"`
-	DatabaseUser          string `mapstructure:"DATABASE_USER" validate:"omitempty"`
-	DatabasePassword      string `mapstructure:"DATABASE_PASSWORD" validate:"omitempty"`
-	DatabaseName          string `mapstructure:"DATABASE_NAME" validate:"omitempty"`
-	DatabasePort          int    `mapstructure:"DATABASE_PORT" validate:"omitempty"`
-	DatabaseSSLMode       string `mapstructure:"DATABASE_SSL_MODE" validate:"omitempty"`
-	AppEnv                string `mapstructure:"APP_ENV" validate:"omitempty"`
-	AppAddr               string `mapstructure:"APP_ADDR" validate:"omitempty"`
+type DatabaseConfig struct {
+	DatabaseURL      string `mapstructure:"DATABASE_URL" validate:"omitempty"`
+	DatabaseHost     string `mapstructure:"DATABASE_HOST" validate:"omitempty"`
+	DatabaseUser     string `mapstructure:"DATABASE_USER" validate:"omitempty"`
+	DatabasePassword string `mapstructure:"DATABASE_PASSWORD" validate:"omitempty"`
+	DatabaseName     string `mapstructure:"DATABASE_NAME" validate:"omitempty"`
+	DatabasePort     int    `mapstructure:"DATABASE_PORT" validate:"omitempty"`
+	DatabaseSSLMode  string `mapstructure:"DATABASE_SSL_MODE" validate:"omitempty"`
+}
+
+type JWTConfig struct {
 	JWTAccessSecret       string `mapstructure:"JWT_ACCESS_SECRET" validate:"omitempty"`
 	JWTRefreshSecret      string `mapstructure:"JWT_REFRESH_SECRET" validate:"omitempty"`
 	JWTVerificationSecret string `mapstructure:"JWT_VERIFICATION_SECRET" validate:"omitempty"`
-	SMTPHost              string `mapstructure:"SMTP_HOST" validate:"omitempty"`
-	SMTPPort              string `mapstructure:"SMTP_PORT" validate:"omitempty"`
-	SMTPSender            string `mapstructure:"SMTP_SENDER" validate:"omitempty"`
-	SMTPEmail             string `mapstructure:"SMTP_EMAIL" validate:"omitempty"`
-	SMTPPassword          string `mapstructure:"SMTP_PASSWORD" validate:"omitempty"`
-	RedisHost             string `mapstructure:"REDIS_HOST" validate:"omitempty"`
-	RedisPort             string `mapstructure:"REDIS_PORT" validate:"omitempty"`
-	RedisPassword         string `mapstructure:"REDIS_PASSWORD" validate:"omitempty"`
-	TargetURL             string `mapstructure:"TARGET_URL" validate:"omitempty"`
 }
 
-func GetEnvs() (Env, error) {
+type SMTPConfig struct {
+	SMTPHost     string `mapstructure:"SMTP_HOST" validate:"omitempty"`
+	SMTPPort     string `mapstructure:"SMTP_PORT" validate:"omitempty"`
+	SMTPSender   string `mapstructure:"SMTP_SENDER" validate:"omitempty"`
+	SMTPEmail    string `mapstructure:"SMTP_EMAIL" validate:"omitempty"`
+	SMTPPassword string `mapstructure:"SMTP_PASSWORD" validate:"omitempty"`
+}
+
+type RedisConfig struct {
+	RedisHost     string `mapstructure:"REDIS_HOST" validate:"omitempty"`
+	RedisPort     string `mapstructure:"REDIS_PORT" validate:"omitempty"`
+	RedisPassword string `mapstructure:"REDIS_PASSWORD" validate:"omitempty"`
+}
+
+type AppEnv string
+
+const (
+	Development AppEnv = "development"
+	Local       AppEnv = "local"
+	Production  AppEnv = "production"
+)
+
+type AppConfig struct {
+	AppEnv      AppEnv `mapstructure:"APP_ENV" validate:"omitempty"`
+	AppAddr     string `mapstructure:"APP_ADDR" validate:"omitempty"`
+	FrontendURL string `mapstructure:"FRONTEND_URL" validate:"omitempty"`
+}
+
+type Env struct {
+	AppConfig
+	DatabaseConfig
+	JWTConfig
+	SMTPConfig
+	RedisConfig
+}
+
+func NewEnvs() (Env, error) {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	appEnv := viper.GetString("APP_ENV")
-	
-	if appEnv == "development" {
+
+	if appEnv == string(Development) || appEnv == string(Local) {
 		viper.SetConfigFile(".env.local")
+	} else if appEnv == string(Production) {
+		viper.SetConfigFile(".env")
 	} else {
 		viper.SetConfigFile(".env")
 	}

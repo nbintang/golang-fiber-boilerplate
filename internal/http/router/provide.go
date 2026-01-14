@@ -1,19 +1,21 @@
 package router
 
-import (
-	"rest-fiber/internal/enums"
-
-	"go.uber.org/fx"
-)
+import "go.uber.org/fx"
 
 type RouteConstructor[P any, R any] func(P) R
 
-func ProvideRoute[P any, R any](
-	routeConstructor RouteConstructor[P, R],
-	acc enums.EAccessType,
-) any {
+type RouteOptions[P HasRouteParamsInjected, R any] struct {
+	Constructor RouteConstructor[P, R]
+	Acc         AccessType
+}
+
+func ProvideRoute[P HasRouteParamsInjected, R any](opts RouteOptions[P, R]) any {
+	acc := opts.Acc
+	if acc == "" {
+		acc = RoutePublic
+	}
 	return fx.Annotate(
-		routeConstructor,
+		opts.Constructor,
 		fx.As(new(R)),
 		fx.ResultTags(string(acc)),
 	)

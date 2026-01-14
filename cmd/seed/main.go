@@ -14,7 +14,7 @@ func main() {
 	env.Load()
 	dbLogger := database.NewLogger()
 
-	env, err := config.GetEnvs()
+	env, err := config.NewEnvs()
 	if err != nil {
 		logrus.Warnf("Seed failed: %v", err)
 	}

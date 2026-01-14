@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"rest-fiber/internal/enums" 
+	"rest-fiber/internal/enums"
 	"rest-fiber/internal/infra/token"
 	"strconv"
 	"time"
@@ -33,19 +33,19 @@ func (s *authServiceImpl) generateTokens(ctx context.Context, id string, email s
 		return TokensResponseDto{}, err
 	}
 
-	if err := s.redisService.Set(ctx, keyRTAccess+refreshJTI, id, refreshTTL); err != nil {
+	if err := s.cacheService.Set(ctx, keyRTAccess+refreshJTI, id, refreshTTL); err != nil {
 		return TokensResponseDto{}, err
 	}
-	if err := s.redisService.Set(ctx, keyRTAccess+refreshJTI, accessJTI, refreshTTL); err != nil {
-		s.redisService.Del(ctx, keyRefresh+refreshJTI)
+	if err := s.cacheService.Set(ctx, keyRTAccess+refreshJTI, accessJTI, refreshTTL); err != nil {
+		s.cacheService.Del(ctx, keyRefresh+refreshJTI)
 		return TokensResponseDto{}, err
 	}
-	if err := s.redisService.Set(ctx, keyRTAccessExp+refreshJTI, accessExpUnix, refreshTTL); err != nil {
-		s.redisService.Del(ctx, keyRefresh+refreshJTI, keyRTAccess+refreshJTI)
+	if err := s.cacheService.Set(ctx, keyRTAccessExp+refreshJTI, accessExpUnix, refreshTTL); err != nil {
+		s.cacheService.Del(ctx, keyRefresh+refreshJTI, keyRTAccess+refreshJTI)
 		return TokensResponseDto{}, err
 	}
-	if err := s.redisService.SAdd(ctx, keyUserTokens+id, refreshJTI, refreshTTL); err != nil {
-		s.redisService.Del(ctx,
+	if err := s.cacheService.SAdd(ctx, keyUserTokens+id, refreshJTI, refreshTTL); err != nil {
+		s.cacheService.Del(ctx,
 			keyRefresh+refreshJTI,
 			keyRTAccess+refreshJTI,
 			keyRTAccessExp+refreshJTI,
@@ -66,7 +66,7 @@ func (s *authServiceImpl) generateVerificationToken(id string) (string, error) {
 
 func (s *authServiceImpl) revokeAllUserTokens(ctx context.Context, userID string) error {
 	userTokensKey := keyUserTokens + userID
-	rtJTIs, err := s.redisService.SMembers(ctx, userTokensKey)
+	rtJTIs, err := s.cacheService.SMembers(ctx, userTokensKey)
 	if err != nil {
 		if err == redis.Nil {
 			return nil
@@ -75,19 +75,19 @@ func (s *authServiceImpl) revokeAllUserTokens(ctx context.Context, userID string
 	}
 	for _, rtJTI := range rtJTIs {
 		s.blacklistAccessByRefreshJTI(ctx, rtJTI)
-		s.redisService.Del(ctx,
+		s.cacheService.Del(ctx,
 			keyRefresh+rtJTI,
 			keyRTAccess+rtJTI,
 			keyRTAccessExp+rtJTI,
 		)
 	}
-	s.redisService.Del(ctx, userTokensKey)
+	s.cacheService.Del(ctx, userTokensKey)
 	s.logger.Infof("revoke all tokens for user : %s", userID)
 	return nil
 }
 
 func (s *authServiceImpl) blacklistAccessByRefreshJTI(ctx context.Context, rtJTI string) error {
-	accessJTI, err := s.redisService.Get(ctx, keyRTAccess+rtJTI)
+	accessJTI, err := s.cacheService.Get(ctx, keyRTAccess+rtJTI)
 	if err != nil {
 		if err != redis.Nil {
 			s.logger.Warnf("failed get rt_access for %s: %v", rtJTI, err)
@@ -98,7 +98,7 @@ func (s *authServiceImpl) blacklistAccessByRefreshJTI(ctx context.Context, rtJTI
 		return nil
 	}
 
-	expStr, err := s.redisService.Get(ctx, keyRTAccessExp+rtJTI)
+	expStr, err := s.cacheService.Get(ctx, keyRTAccessExp+rtJTI)
 	if err != nil {
 		if err != redis.Nil {
 			s.logger.Warnf("failed get rt_access_exp for %s: %v", rtJTI, err)
@@ -112,5 +112,5 @@ func (s *authServiceImpl) blacklistAccessByRefreshJTI(ctx context.Context, rtJTI
 		return nil
 	}
 
-	return s.redisService.Set(ctx, keyBLAccess+accessJTI, "1", ttl)
+	return s.cacheService.Set(ctx, keyBLAccess+accessJTI, "1", ttl)
 }

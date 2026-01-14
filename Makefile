@@ -1,17 +1,30 @@
-.PHONY: run migrate seed build clean
+.PHONY: dev migrate seed build clean
 
-ENV_FILE=.env.local
-APP_NAME=app
-BUILD_DIR=bin
+ENV_FILE := .env.local
+APP_NAME := app
+BUILD_DIR := bin
 
-run:
-	@export $$(cat $(ENV_FILE) | xargs) && go run ./cmd/api/main.go
+ifeq ($(OS),Windows_NT)
+SHELL := powershell.exe
+.SHELLFLAGS := -NoProfile -ExecutionPolicy Bypass -Command
+AIR := air
+LOAD_ENV := ./scripts/load-env.ps1 -EnvFile $(ENV_FILE);
+else
+SHELL := /bin/bash
+.SHELLFLAGS := -lc
+AIR := air
+LOAD_ENV := set -a; [ -f $(ENV_FILE) ] && . $(ENV_FILE); set +a;
+endif
+
+dev:
+	@echo "🚀 Running with Air..."
+	@$(LOAD_ENV) $(AIR)
 
 migrate:
-	@export $$(cat $(ENV_FILE) | xargs) && go run ./cmd/migrate
+	@$(LOAD_ENV) go run ./cmd/migrate
 
 seed:
-	@export $$(cat $(ENV_FILE) | xargs) && go run ./cmd/seed
+	@$(LOAD_ENV) go run ./cmd/seed
 
 build:
 	@echo "🔨 Building binary..."

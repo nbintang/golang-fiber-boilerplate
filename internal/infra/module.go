@@ -1,10 +1,10 @@
 package infra
 
 import (
+	"rest-fiber/internal/infra/cache"
 	"rest-fiber/internal/infra/database"
 	"rest-fiber/internal/infra/email"
 	"rest-fiber/internal/infra/infraapp"
-	"rest-fiber/internal/infra/rediscache"
 	"rest-fiber/internal/infra/token"
 	"rest-fiber/internal/infra/validator"
 
@@ -15,7 +15,7 @@ var Module = fx.Module(
 	"infra",
 	fx.Provide(
 		database.NewService,
-		rediscache.NewService,
+		cache.NewService,
 	),
 	fx.Provide(
 		validator.NewService,
@@ -27,7 +27,7 @@ var Module = fx.Module(
 		database.NewLogger,
 	),
 	fx.Invoke(
-		rediscache.RegisterLifecycle,
+		cache.RegisterLifecycle,
 		database.RegisterLifecycle,
 	),
 )

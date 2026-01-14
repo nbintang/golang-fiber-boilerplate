@@ -5,7 +5,7 @@ import (
 )
 
 type RoutesIn struct {
-	router.RouteParams
+	router.InjectRouteParams
 	App       *Bootstrap
 	Routes    []router.Route          `group:"public_routes"`
 	Protected []router.ProtectedRoute `group:"protected_routes"`

@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"rest-fiber/internal/identity"
-	"rest-fiber/internal/infra/rediscache"
+	"rest-fiber/internal/infra/cache"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
 
-func AccessNotBlacklisted(redisService rediscache.Service) fiber.Handler {
+func AccessNotBlacklisted(cacheService cache.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user, err := identity.CurrentUser(c)
 		if err != nil {
@@ -16,7 +16,7 @@ func AccessNotBlacklisted(redisService rediscache.Service) fiber.Handler {
 		}
 		key := "blacklist_access:" + user.JTI
 		ctx := c.UserContext()
-		_, err = redisService.Get(ctx, key)
+		_, err = cacheService.Get(ctx, key)
 		if err == nil {
 			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 		}

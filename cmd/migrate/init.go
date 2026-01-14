@@ -11,7 +11,7 @@ import (
 
 func InitMigrate(ctx context.Context) error {
 	dbLogger := database.NewLogger()
-	env, err := config.GetEnvs()
+	env, err := config.NewEnvs()
 	if err != nil {
 		return err
 	}

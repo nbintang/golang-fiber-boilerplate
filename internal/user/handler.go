@@ -35,7 +35,7 @@ func (h *userHandlerImpl) GetAllUsers(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	meta := pagination.NewPaginationMeta(query.Page, query.Limit, total)
+	meta := pagination.NewMeta(query.Page, query.Limit, total)
 	return c.Status(fiber.StatusOK).JSON(httpx.NewHttpPaginationResponse[[]UserResponseDTO](
 		fiber.StatusOK,
 		"Success",

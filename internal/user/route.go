@@ -9,7 +9,7 @@ import (
 )
 
 type UserRouteParams struct {
-	router.RouteParams
+	router.InjectRouteParams
 	UserHandler UserHandler
 }
 type userRouteImpl struct {

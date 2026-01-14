@@ -5,9 +5,9 @@ import (
 	"errors"
 	"rest-fiber/config"
 	"rest-fiber/internal/enums"
+	"rest-fiber/internal/infra/cache"
 	"rest-fiber/internal/infra/email"
 	"rest-fiber/internal/infra/infraapp"
-	"rest-fiber/internal/infra/rediscache"
 	"rest-fiber/internal/infra/token"
 	"rest-fiber/internal/user"
 	"rest-fiber/pkg/password"
@@ -18,7 +18,7 @@ type authServiceImpl struct {
 	userRepo     user.UserRepository
 	tokenService token.Service
 	emailService email.EmailService
-	redisService rediscache.Service
+	cacheService cache.Service
 	env          config.Env
 	logger       *infraapp.AppLogger
 }
@@ -27,11 +27,11 @@ func NewAuthService(
 	userRepo user.UserRepository,
 	tokenService token.Service,
 	emailService email.EmailService,
-	redisService rediscache.Service,
+	cacheService cache.Service,
 	env config.Env,
 	logger *infraapp.AppLogger,
 ) AuthService {
-	return &authServiceImpl{userRepo, tokenService, emailService, redisService, env, logger}
+	return &authServiceImpl{userRepo, tokenService, emailService, cacheService, env, logger}
 }
 
 func (s *authServiceImpl) Register(ctx context.Context, dto *RegisterRequestDTO) error {
@@ -67,7 +67,7 @@ func (s *authServiceImpl) sendEmail(emailAddr, token, subject string) {
 	defer cancel()
 	if err := s.emailService.SendEmail(emailCtx, email.Params{
 		Subject: subject,
-		Message: s.env.TargetURL + token,
+		Message: s.env.FrontendURL + token,
 		Reciever: email.Reciever{
 			Email: emailAddr,
 		}}); err != nil {
@@ -100,7 +100,7 @@ func (s *authServiceImpl) RefreshToken(ctx context.Context, refreshToken string)
 	if !ok || oldRT == "" || userID == "" {
 		return TokensResponseDto{}, errors.New("invalid token claims")
 	}
-	storedUserID, exists, err := s.redisService.GetAndDel(ctx, keyRefresh+oldRT)
+	storedUserID, exists, err := s.cacheService.GetAndDel(ctx, keyRefresh+oldRT)
 	if err != nil {
 		return TokensResponseDto{}, err
 	}
@@ -110,8 +110,8 @@ func (s *authServiceImpl) RefreshToken(ctx context.Context, refreshToken string)
 		return TokensResponseDto{}, errors.New("token reuse detected")
 	}
 	s.blacklistAccessByRefreshJTI(ctx, oldRT)
-	s.redisService.Del(ctx, keyRTAccess+oldRT, keyRTAccessExp+oldRT)
-	s.redisService.SRem(ctx, keyUserTokens+userID, oldRT)
+	s.cacheService.Del(ctx, keyRTAccess+oldRT, keyRTAccessExp+oldRT)
+	s.cacheService.SRem(ctx, keyUserTokens+userID, oldRT)
 	user, err := s.userRepo.FindByIDWithRole(ctx, userID)
 	if err != nil {
 		return TokensResponseDto{}, err
@@ -160,11 +160,11 @@ func (s *authServiceImpl) Logout(ctx context.Context, refreshToken string) error
 		return errors.New("invalid token claims")
 	}
 	s.blacklistAccessByRefreshJTI(ctx, rtJTI)
-	s.redisService.Del(ctx,
+	s.cacheService.Del(ctx,
 		keyRefresh+rtJTI,
 		keyRTAccess+rtJTI,
 		keyRTAccessExp+rtJTI,
 	)
-	s.redisService.SRem(ctx, keyUserTokens+userID, rtJTI)
+	s.cacheService.SRem(ctx, keyUserTokens+userID, rtJTI)
 	return nil
 }
