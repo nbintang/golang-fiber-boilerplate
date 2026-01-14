@@ -65,7 +65,7 @@ This repository provides a production-ready backend boilerplate for building RES
 │   ├── seed.sh
 │   └── reset-db.sh
 │
-├── tests                 # Integration / e2e tests (optional)
+├── e2e                 # Integration / e2e tests (optional)
 │   ├── auth_test.go
 │   └── user_test.go
 │
