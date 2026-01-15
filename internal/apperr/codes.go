@@ -1,0 +1,28 @@
+package apperr
+
+const (
+	CodeBadRequest                   AppErrorCode = "BAD_REQUEST"
+	CodeUnauthorized                 AppErrorCode = "UNAUTHORIZED"
+	CodePaymentRequired              AppErrorCode = "PAYMENT_REQUIRED"
+	CodeForbidden                    AppErrorCode = "FORBIDDEN"
+	CodeNotFound                     AppErrorCode = "NOT_FOUND"
+	CodeMethodNotAllowed             AppErrorCode = "METHOD_NOT_ALLOWED"
+	CodeNotAcceptable                AppErrorCode = "NOT_ACCEPTABLE"
+	CodeRequestTimeout               AppErrorCode = "REQUEST_TIMEOUT"
+	CodeConflict                     AppErrorCode = "CONFLICT"
+	CodeGone                         AppErrorCode = "GONE"
+	CodeLengthRequired               AppErrorCode = "LENGTH_REQUIRED"
+	CodePreconditionFailed           AppErrorCode = "PRECONDITION_FAILED"
+	CodeRequestEntityTooLarge        AppErrorCode = "REQUEST_ENTITY_TOO_LARGE"
+	CodeRequestURITooLong            AppErrorCode = "REQUEST_URI_TOO_LONG"
+	CodeUnsupportedMediaType         AppErrorCode = "UNSUPPORTED_MEDIA_TYPE"
+	CodeRequestedRangeNotSatisfiable AppErrorCode = "REQUESTED_RANGE_NOT_SATISFIABLE"
+	CodeUnprocessableEntity          AppErrorCode = "UNPROCESSABLE_ENTITY"
+	CodeLocked                       AppErrorCode = "LOCKED"
+	CodeTooManyRequests              AppErrorCode = "TOO_MANY_REQUESTS"
+	CodeInternal                     AppErrorCode = "INTERNAL"
+	CodeNotImplemented               AppErrorCode = "NOT_IMPLEMENTED"
+	CodeBadGateway                   AppErrorCode = "BAD_GATEWAY"
+	CodeServiceUnavailable           AppErrorCode = "SERVICE_UNAVAILABLE"
+	CodeGatewayTimeout               AppErrorCode = "GATEWAY_TIMEOUT"
+)

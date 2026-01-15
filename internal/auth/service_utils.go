@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"rest-fiber/internal/enums"
+	"rest-fiber/internal/infra/email"
 	"rest-fiber/internal/infra/token"
 	"strconv"
 	"time"
@@ -113,4 +114,17 @@ func (s *authServiceImpl) blacklistAccessByRefreshJTI(ctx context.Context, rtJTI
 	}
 
 	return s.cacheService.Set(ctx, keyBLAccess+accessJTI, "1", ttl)
+}
+
+func (s *authServiceImpl) sendEmail(emailAddr, subject, messsage string) {
+	emailCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := s.emailService.SendEmail(emailCtx, email.Params{
+		Subject: subject,
+		Message: messsage,
+		Reciever: email.Reciever{
+			Email: emailAddr,
+		}}); err != nil {
+		s.logger.Error(err)
+	}
 }

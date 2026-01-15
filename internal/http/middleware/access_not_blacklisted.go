@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"rest-fiber/internal/apperr"
 	"rest-fiber/internal/identity"
 	"rest-fiber/internal/infra/cache"
 
@@ -16,12 +17,11 @@ func AccessNotBlacklisted(cacheService cache.Service) fiber.Handler {
 		}
 		key := "blacklist_access:" + user.JTI
 		ctx := c.UserContext()
-		_, err = cacheService.Get(ctx, key)
-		if err == nil {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+		if _, err = cacheService.Get(ctx, key); err == nil {
+			return apperr.Forbidden(apperr.CodeForbidden, "Access Denied", err)
 		}
 		if err != redis.Nil {
-			return fiber.NewError(fiber.StatusInternalServerError, "redis error")
+			return apperr.Internal(apperr.CodeInternal, "Internal Server Error", err)
 		}
 		return c.Next()
 	}

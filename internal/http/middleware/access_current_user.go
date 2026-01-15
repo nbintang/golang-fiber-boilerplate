@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+	"rest-fiber/internal/apperr"
 	"rest-fiber/internal/enums"
 	"rest-fiber/internal/identity"
 
@@ -12,11 +14,11 @@ func AccessCurrentUser() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token, ok := c.Locals(enums.AccessAuthKey).(*jwt.Token)
 		if !ok || token == nil {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return apperr.Unauthorized(apperr.CodeUnauthorized, "Unauthorized", errors.New("Unauthorized"))
 		}
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return  apperr.Internal(apperr.CodeInternal, "Internal Server Error", errors.New("Internal Server Error"))
 		}
 		id, _ := claims["id"].(string)
 		email, _ := claims["email"].(string)
@@ -26,7 +28,7 @@ func AccessCurrentUser() fiber.Handler {
 			email == "" ||
 			role == "" ||
 			jti == "" {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return apperr.Unauthorized(apperr.CodeUnauthorized, "Unauthorized", errors.New("Unauthorized"))
 		}
 		c.Locals(enums.CurrentUserKey, &identity.AuthClaims{
 			ID:    id,

@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"errors"
 	"rest-fiber/config"
+	"rest-fiber/internal/apperr"
 	"rest-fiber/internal/infra/infraapp"
 	"rest-fiber/internal/infra/validator"
 	"rest-fiber/pkg/httpx"
@@ -26,14 +28,13 @@ func (h *authHandlerImpl) Register(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 
 	if err := c.BodyParser(&body); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return apperr.BadRequest(apperr.CodeBadRequest, "Invalid Request", err)
 	}
 	if err := h.validate.Struct(body); err != nil {
-		return err
+		return apperr.BadRequest(apperr.CodeBadRequest, "Validation Error", err)
 	}
-
 	if err := h.authService.Register(ctx, &body); err != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		return err
 	}
 	return c.Status(fiber.StatusCreated).JSON(httpx.NewHttpResponse[any](
 		fiber.StatusCreated,
@@ -47,7 +48,7 @@ func (h *authHandlerImpl) VerifyEmail(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	tokens, err := h.authService.VerifyEmailToken(ctx, token)
 	if err != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		return apperr.Unauthorized(apperr.CodeUnauthorized, "Unathorized", err)
 	}
 	h.setRefreshTokenCookie(c, tokens.RefreshToken)
 	return c.Status(fiber.StatusOK).JSON(httpx.NewHttpResponse(
@@ -61,11 +62,11 @@ func (h *authHandlerImpl) Login(c *fiber.Ctx) error {
 	var body LoginRequestDTO
 	ctx := c.UserContext()
 	if err := c.BodyParser(&body); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return apperr.BadRequest(apperr.CodeBadRequest, "Invalid Request", err)
 	}
 	tokens, err := h.authService.Login(ctx, &body)
 	if err != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		return err
 	}
 	h.setRefreshTokenCookie(c, tokens.RefreshToken)
 	return c.Status(fiber.StatusOK).JSON(
@@ -80,13 +81,13 @@ func (h *authHandlerImpl) RefreshToken(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	oldRefreshToken := c.Cookies("refresh_token")
 	if oldRefreshToken == "" {
-		return fiber.NewError(fiber.StatusUnauthorized, "no refresh token provided")
+		return  apperr.Unauthorized(apperr.CodeUnauthorized, "Unathorized", errors.New("Unathorized"))
 	}
 
 	tokens, err := h.authService.RefreshToken(ctx, oldRefreshToken)
 	if err != nil {
 		h.clearRefreshTokenCookie(c)
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return apperr.Unauthorized(apperr.CodeUnauthorized, "Unathorized", err)
 	}
 
 	h.setRefreshTokenCookie(c, tokens.RefreshToken)
@@ -100,12 +101,14 @@ func (h *authHandlerImpl) RefreshToken(c *fiber.Ctx) error {
 func (h *authHandlerImpl) Logout(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	refreshToken := c.Cookies("refresh_token")
-	err := h.authService.Logout(ctx, refreshToken)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "no token provide, please login!")
+	if err := h.authService.Logout(ctx, refreshToken); err != nil {
+		return err
 	}
 	h.clearRefreshTokenCookie(c)
-	return c.Status(fiber.StatusBadRequest).JSON(httpx.NewHttpResponse[any](fiber.StatusOK, "logout Success", nil))
+	return c.Status(fiber.StatusBadRequest).JSON(httpx.NewHttpResponse[any](
+		fiber.StatusBadRequest, 
+		"logout Success", nil,
+		))
 }
 
 func (h *authHandlerImpl) setRefreshTokenCookie(c *fiber.Ctx, token string) {

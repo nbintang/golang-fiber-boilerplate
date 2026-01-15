@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"rest-fiber/internal/apperr"
 	"rest-fiber/internal/infra/cache"
 	"rest-fiber/internal/infra/infraapp"
 	"rest-fiber/pkg/slice"
@@ -32,7 +33,7 @@ func (s *userServiceImpl) FindAllUsers(ctx context.Context, page, limit, offset 
 
 	users, total, err := s.userRepo.FindAll(ctx, limit, offset)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperr.Internal(apperr.CodeInternal, "Internal Server Error", err)
 	}
 	userResponses := slice.Map[User, UserResponseDTO](users, func(u User) UserResponseDTO {
 		return UserResponseDTO{
@@ -63,10 +64,10 @@ func (s *userServiceImpl) FindUserByID(ctx context.Context, id string) (*UserRes
 	}
 	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, apperr.Internal(apperr.CodeInternal, "Internal Server Error", err)
 	}
 	if user == nil {
-		return nil, errors.New("User Not Found")
+		return nil, apperr.NotFound(apperr.CodeNotFound, "User Not Found", errors.New("User Not Found"))
 	}
 
 	dto := &UserResponseDTO{
@@ -87,7 +88,10 @@ func (s *userServiceImpl) FindUserByID(ctx context.Context, id string) (*UserRes
 func (s *userServiceImpl) UpdateProfile(ctx context.Context, id string, dto UserUpdateDTO) error {
 	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
-		return err
+		return apperr.Internal(apperr.CodeInternal, "Internal Server Error", err)
+	}
+	if user == nil {
+		return apperr.NotFound(apperr.CodeNotFound, "User Not Found", errors.New("User Not Found"))
 	}
 	user.Name = dto.Name
 	user.AvatarURL = dto.AvatarURL

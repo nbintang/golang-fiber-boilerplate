@@ -20,20 +20,11 @@ type serviceImpl struct {
 }
 func NewService(env config.Env) (Service, error) {
 	host := strings.TrimSpace(env.RedisHost)
-	if host == "" {
-		return nil, fmt.Errorf("REDIS_HOST is empty")
-	}
-
 	portStr := strings.TrimSpace(env.RedisPort)
-	if portStr == "" {
-		return nil, fmt.Errorf("REDIS_PORT is empty")
-	}
-
 	port, err := strconv.Atoi(portStr)
 	if err != nil || port <= 0 || port > 65535 {
 		return nil, fmt.Errorf("invalid REDIS_PORT=%q", portStr)
 	}
-
 	password := env.RedisPassword
 	address := fmt.Sprintf("%s:%d", host, port)
 

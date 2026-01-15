@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"rest-fiber/internal/apperr"
 	"rest-fiber/internal/enums"
 	"rest-fiber/internal/identity"
 
@@ -18,7 +19,7 @@ func AllowRoleAccess(roles ...enums.EUserRoleType) fiber.Handler {
 			return err
 		}
 		if _, ok := roleSet[user.Role]; !ok {
-			return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+			return apperr.Forbidden(apperr.CodeForbidden, "Forbidden", nil)
 		}
 		return c.Next()
 	}

@@ -1,6 +1,8 @@
 package cache
 
 import (
+	"errors"
+	"rest-fiber/internal/apperr"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,12 +10,12 @@ import (
 )
 
 func Throttle(params ThrottleParams) fiber.Handler {
-	exp := params.Expiration;
+	exp := params.Expiration
 	if exp <= 0 {
 		exp = 1 * time.Minute
 	}
 
-	prefix := params.Prefix;
+	prefix := params.Prefix
 	if prefix == "" {
 		prefix = "route"
 	}
@@ -27,7 +29,11 @@ func Throttle(params ThrottleParams) fiber.Handler {
 		SkipFailedRequests:     false,
 		SkipSuccessfulRequests: false,
 		LimitReached: func(c *fiber.Ctx) error {
-			return fiber.NewError(fiber.StatusTooManyRequests, "Too many requests")
+			return apperr.TooManyRequests(
+				apperr.CodeTooManyRequests,
+				"Too Many Request",
+				errors.New("Too Many Request"),
+			)
 		},
 	}
 	if params.Storage != nil {
