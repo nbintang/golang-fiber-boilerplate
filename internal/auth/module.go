@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"go.uber.org/fx"
 	"rest-fiber/internal/http/router"
+
+	"go.uber.org/fx"
 )
 
 var Module = fx.Module(
@@ -11,7 +12,7 @@ var Module = fx.Module(
 		NewAuthService,
 		NewAuthHandler,
 		router.ProvideRoute[AuthRouteParams, router.Route](
-			router.RouteOptions[AuthRouteParams, router.Route]{
+			router.ProvideRouteOptions[AuthRouteParams, router.Route]{
 				Constructor: NewAuthRoute,
 				Acc:         router.RouteProtected,
 			},

@@ -9,11 +9,8 @@ import (
 func RequestMeta() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
-
-		// lanjutkan request
 		err := c.Next()
-
-		// simpan metadata di Locals
+		
 		c.Locals("method", c.Method())
 		c.Locals("path", c.OriginalURL())
 		if c.Route() != nil {

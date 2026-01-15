@@ -4,12 +4,12 @@ import "go.uber.org/fx"
 
 type RouteConstructor[P any, R any] func(P) R
 
-type RouteOptions[P HasRouteParamsInjected, R any] struct {
+type ProvideRouteOptions[P HasRouteParamsInjected, R any] struct {
 	Constructor RouteConstructor[P, R]
 	Acc         AccessType
 }
 
-func ProvideRoute[P HasRouteParamsInjected, R any](opts RouteOptions[P, R]) any {
+func ProvideRoute[P HasRouteParamsInjected, R any](opts ProvideRouteOptions[P, R]) any {
 	acc := opts.Acc
 	if acc == "" {
 		acc = RoutePublic

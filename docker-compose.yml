@@ -19,7 +19,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: app_redis
-    # kalau REDIS_PASSWORD kosong, redis jalan tanpa auth
     command: >
       sh -c '
         if [ -n "$$REDIS_PASSWORD" ]; then
@@ -39,8 +38,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
-  # jalanin migrasi sekali sebelum api start
   migrate:
     build:
       context: .
@@ -65,11 +62,11 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
 
-      # JWT (kalau migrate butuh config ini, kalau tidak ya tetap aman)
+      # JWT  
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_VERIFICATION_SECRET: ${JWT_VERIFICATION_SECRET}
 
-      # SMTP (kalau tidak dipakai migrate, tetap boleh)
+      # SMTP  
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_SENDER: ${SMTP_SENDER}
